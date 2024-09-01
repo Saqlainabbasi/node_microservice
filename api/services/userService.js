@@ -2,15 +2,16 @@ module.exports = class UserService {
   constructor(userRepo) {
     this.userRepo = userRepo;
   }
-
   async createUser(req) {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password } = req;
     const user = {
       firstName,
       lastName,
       email,
       password,
     };
+    console.log(req);
+    // this.userRepo.
     return await this.userRepo.persist(user);
   }
 

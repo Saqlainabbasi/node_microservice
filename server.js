@@ -16,7 +16,7 @@ async function startServer() {
     await db.init(); // Assuming init() returns a Promise
 
     expressConfig(app);
-    const repo = BuildRepo();
+    const repo = BuildRepo().userRepository;
     let connection, channel;
     async function connectToRabbitMQ() {
       const amqpServer = environment.amqp.url;
@@ -28,10 +28,19 @@ async function startServer() {
     connectToRabbitMQ().then(() => {
       channel.consume("create_user_service", async (data) => {
         // order service queue listens to this queue
-        const { user } = JSON.parse(data.content);
-        const createOrder = new UserService(repo).createOrder;
-        const newOrder = await createOrder(user);
-        channel.ack(data);
+        //read the data from the data.content buffer
+
+        const user = JSON.parse(data.content.toString());
+        const { Name: firstName, Email: email, Paswrd: password } = user;
+        const userService = new UserService(repo);
+        const newUser = await userService.createUser({
+          firstName,
+          email,
+          password,
+        });
+        if (newUser) {
+          channel.ack(data);
+        }
         //   channel.sendToQueue(
         //     "product-service-queue",
         //     Buffer.from(JSON.stringify(newOrder))

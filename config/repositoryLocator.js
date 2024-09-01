@@ -3,7 +3,7 @@ const environment = require("./environment");
 
 function BuildRepo() {
   let repo = {};
-  if (environment.database.dialect == "mongoDB") {
+  if (environment.database.dialect == "mongodb") {
     repo.userRepository = new MongoUserRepo();
   }
   if (environment.database.dialect == "mysql") {
